@@ -95,7 +95,7 @@ export function SurveyForm() {
                 Nueva Psychology
               </h1>
               <p className="text-slate-500 max-w-md mx-auto">
-                Prof. Amy's Correlation Study — answer honestly and see what patterns emerge! 📊
+                NON-SERIOUS EXAMPLE for demonstrating correlational studies — answer honestly and let's see if anything interesting happens!
               </p>
 
               {/* Progress indicator */}
