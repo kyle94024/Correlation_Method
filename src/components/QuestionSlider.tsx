@@ -31,6 +31,12 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
     }
   };
 
+  // Calculate intensity for each side (0 to 1)
+  // Left side: strongest at 1, fades to 0 at 4+
+  const leftIntensity = localValue <= 4 ? (4 - localValue) / 3 : 0;
+  // Right side: strongest at 7, fades to 0 at 4-
+  const rightIntensity = localValue >= 4 ? (localValue - 4) / 3 : 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -68,17 +74,25 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
 
       <div className={`transition-opacity duration-300 ${isSkipped ? 'opacity-30 pointer-events-none' : ''}`}>
         
-        {/* Scale labels - NOW VERY PROMINENT */}
+        {/* Scale labels - with continuous color intensity */}
         <div className="flex justify-between items-stretch gap-3 mb-4">
           <div 
-            className={`flex-1 p-3 rounded-xl text-center transition-all ${
-              localValue <= 2 
-                ? 'bg-cyan-100 border-2 border-cyan-400 shadow-sm' 
-                : 'bg-slate-50 border-2 border-transparent'
-            }`}
+            className="flex-1 p-3 rounded-xl text-center transition-all border-2"
+            style={{
+              backgroundColor: `rgba(6, 182, 212, ${leftIntensity * 0.2})`,
+              borderColor: `rgba(6, 182, 212, ${leftIntensity * 0.8})`,
+              boxShadow: leftIntensity > 0.3 ? `0 2px 8px rgba(6, 182, 212, ${leftIntensity * 0.3})` : 'none',
+            }}
           >
             <div className="text-xs text-slate-400 mb-1">1 =</div>
-            <div className={`font-semibold text-sm ${localValue <= 2 ? 'text-cyan-700' : 'text-slate-600'}`}>
+            <div 
+              className="font-semibold text-sm transition-colors"
+              style={{
+                color: leftIntensity > 0.2 
+                  ? `rgba(14, 116, 144, ${0.5 + leftIntensity * 0.5})` 
+                  : '#475569'
+              }}
+            >
               {question.lowLabel}
             </div>
           </div>
@@ -90,14 +104,22 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
           </div>
           
           <div 
-            className={`flex-1 p-3 rounded-xl text-center transition-all ${
-              localValue >= 6 
-                ? 'bg-emerald-100 border-2 border-emerald-400 shadow-sm' 
-                : 'bg-slate-50 border-2 border-transparent'
-            }`}
+            className="flex-1 p-3 rounded-xl text-center transition-all border-2"
+            style={{
+              backgroundColor: `rgba(16, 185, 129, ${rightIntensity * 0.2})`,
+              borderColor: `rgba(16, 185, 129, ${rightIntensity * 0.8})`,
+              boxShadow: rightIntensity > 0.3 ? `0 2px 8px rgba(16, 185, 129, ${rightIntensity * 0.3})` : 'none',
+            }}
           >
             <div className="text-xs text-slate-400 mb-1">7 =</div>
-            <div className={`font-semibold text-sm ${localValue >= 6 ? 'text-emerald-700' : 'text-slate-600'}`}>
+            <div 
+              className="font-semibold text-sm transition-colors"
+              style={{
+                color: rightIntensity > 0.2 
+                  ? `rgba(4, 120, 87, ${0.5 + rightIntensity * 0.5})` 
+                  : '#475569'
+              }}
+            >
               {question.highLabel}
             </div>
           </div>
@@ -109,7 +131,14 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
             key={localValue}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="px-5 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-bold text-lg shadow-md"
+            className="px-5 py-2 rounded-full text-white font-bold text-lg shadow-md"
+            style={{
+              background: `linear-gradient(135deg, 
+                rgba(6, 182, 212, ${0.3 + leftIntensity * 0.7}) 0%, 
+                rgba(100, 116, 139, ${localValue === 4 ? 0.8 : 0.3}) 50%,
+                rgba(16, 185, 129, ${0.3 + rightIntensity * 0.7}) 100%
+              )`,
+            }}
           >
             {localValue}
           </motion.div>
@@ -146,9 +175,16 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
                 }}
                 className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-mono transition-all duration-200 ${
                   step === localValue
-                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-bold scale-110 shadow-md'
+                    ? 'text-white font-bold scale-110 shadow-md'
                     : 'bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600'
                 }`}
+                style={step === localValue ? {
+                  background: step <= 3 
+                    ? `rgba(6, 182, 212, ${0.6 + (4 - step) * 0.13})`
+                    : step >= 5
+                      ? `rgba(16, 185, 129, ${0.6 + (step - 4) * 0.13})`
+                      : '#64748b'
+                } : {}}
               >
                 {step}
               </button>
