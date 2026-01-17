@@ -1,3 +1,5 @@
+// src/components/SurveyForm.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +9,7 @@ import { QUESTIONS } from '@/config/questions';
 import { QuestionSlider } from './QuestionSlider';
 import { ResultsDisplay } from './ResultsDisplay';
 import { generateFingerprint } from '@/lib/fingerprint';
-import { submitSurvey } from '@/app/actions';
+import { submitSurvey, getCorrelations, getTotalResponses } from '@/app/actions';
 
 export function SurveyForm() {
   const [stage, setStage] = useState<'survey' | 'submitting' | 'results'>('survey');
@@ -63,6 +65,30 @@ export function SurveyForm() {
     }
   };
 
+  const handleSkipToResults = async () => {
+    setStage('submitting');
+    setError(null);
+
+    try {
+      const [correlations, totalResponses] = await Promise.all([
+        getCorrelations(),
+        getTotalResponses(),
+      ]);
+      
+      setResult({
+        success: true,
+        alreadySubmitted: true,
+        correlations,
+        totalResponses,
+      });
+      setStage('results');
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setError('Network error. Please try again.');
+      setStage('survey');
+    }
+  };
+
   // Count answered questions
   const answeredCount = Object.values(surveyData).filter((v) => v !== null).length;
 
@@ -77,6 +103,23 @@ export function SurveyForm() {
           className="min-h-screen py-8 px-4 md:px-6"
         >
           <div className="max-w-2xl mx-auto">
+            {/* Skip to Results Button */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-end mb-4"
+            >
+              <button
+                onClick={handleSkipToResults}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium transition-all"
+              >
+                Skip to Results
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </motion.div>
+
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -95,7 +138,7 @@ export function SurveyForm() {
                 Correlational Studies Example (Psych 102)
               </h1>
               <p className="text-slate-500 max-w-md mx-auto">
-              THIS IS NOT A REAL CORRELATIONAL STUDY. THIS SURVEY IS NOT SCIENTIFICALLY SOUND. IT\'S JUST FOR FUN — answer honestly and let's see if anything interesting happens!
+              THIS IS NOT A REAL CORRELATIONAL STUDY. THIS SURVEY IS NOT SCIENTIFICALLY SOUND. IT'S JUST FOR FUN — answer honestly and let's see if anything interesting happens!
               </p>
 
               {/* Progress indicator */}
