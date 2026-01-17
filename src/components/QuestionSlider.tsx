@@ -1,3 +1,5 @@
+// src/components/QuestionSlider.tsx
+
 'use client';
 
 import { useState } from 'react';
@@ -65,16 +67,51 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
       </div>
 
       <div className={`transition-opacity duration-300 ${isSkipped ? 'opacity-30 pointer-events-none' : ''}`}>
-        {/* Value indicator */}
-        <div className="flex items-center justify-center mb-4">
+        
+        {/* Scale labels - NOW VERY PROMINENT */}
+        <div className="flex justify-between items-stretch gap-3 mb-4">
+          <div 
+            className={`flex-1 p-3 rounded-xl text-center transition-all ${
+              localValue <= 2 
+                ? 'bg-cyan-100 border-2 border-cyan-400 shadow-sm' 
+                : 'bg-slate-50 border-2 border-transparent'
+            }`}
+          >
+            <div className="text-xs text-slate-400 mb-1">1 =</div>
+            <div className={`font-semibold text-sm ${localValue <= 2 ? 'text-cyan-700' : 'text-slate-600'}`}>
+              {question.lowLabel}
+            </div>
+          </div>
+          
+          <div className="flex items-center">
+            <svg className="w-6 h-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h8m-4-4l4 4-4 4" />
+            </svg>
+          </div>
+          
+          <div 
+            className={`flex-1 p-3 rounded-xl text-center transition-all ${
+              localValue >= 6 
+                ? 'bg-emerald-100 border-2 border-emerald-400 shadow-sm' 
+                : 'bg-slate-50 border-2 border-transparent'
+            }`}
+          >
+            <div className="text-xs text-slate-400 mb-1">7 =</div>
+            <div className={`font-semibold text-sm ${localValue >= 6 ? 'text-emerald-700' : 'text-slate-600'}`}>
+              {question.highLabel}
+            </div>
+          </div>
+        </div>
+
+        {/* Current selection display */}
+        <div className="flex items-center justify-center mb-3">
           <motion.div
             key={localValue}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-50 to-emerald-50 border border-cyan-200"
+            className="px-5 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-bold text-lg shadow-md"
           >
-            <span className="font-mono text-xl font-bold text-cyan-600">{localValue}</span>
-            <span className="text-slate-400 text-sm ml-2">/ 7</span>
+            {localValue}
           </motion.div>
         </div>
 
@@ -99,7 +136,7 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
           />
           
           {/* Step indicators */}
-          <div className="flex justify-between mt-3 px-0.5">
+          <div className="flex justify-between mt-2 px-0.5">
             {[1, 2, 3, 4, 5, 6, 7].map((step) => (
               <button
                 key={step}
@@ -107,9 +144,9 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
                   setLocalValue(step);
                   if (!isSkipped) onChange(step);
                 }}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono transition-all duration-200 ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-mono transition-all duration-200 ${
                   step === localValue
-                    ? 'bg-cyan-500 text-white font-bold scale-110 shadow-md'
+                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-bold scale-110 shadow-md'
                     : 'bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600'
                 }`}
               >
@@ -117,12 +154,6 @@ export function QuestionSlider({ question, value, onChange, index }: QuestionSli
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Labels */}
-        <div className="flex justify-between mt-3 text-xs text-slate-400">
-          <span>{question.lowLabel}</span>
-          <span>{question.highLabel}</span>
         </div>
       </div>
     </motion.div>

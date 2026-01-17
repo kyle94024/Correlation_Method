@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Nueva Psychology | Correlation Study',
-  description: 'Prof. Amy\'s class correlation study — discover patterns in how we think and feel!',
+  title: 'Nueva Psychology | Correlational Studies Example',
+  description: 'THIS IS NOT A REAL CORRELATIONAL STUDY. THIS SURVEY IS NOT SCIENTIFICALLY SOUND. IT\'S JUST FOR FUN.',
   keywords: ['correlation', 'psychology', 'study', 'nueva', 'statistics'],
 };
 
