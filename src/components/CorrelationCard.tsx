@@ -1,3 +1,5 @@
+// src/components/CorrelationCard.tsx
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -14,7 +16,7 @@ interface CorrelationCardProps {
 export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
   const colors = getCorrelationColor(result);
   const strengthLabel = getStrengthLabel(result.strength);
-  const absR = Math.abs(result.correlation);
+  const absR = result.correlation !== null ? Math.abs(result.correlation) : 0;
   const percentage = Math.round(absR * 100);
 
   // Animation variants based on rank
@@ -53,11 +55,14 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
         </svg>
       );
     }
-    return (
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M7 7L17 17M17 17H7M17 17V7" />
-      </svg>
-    );
+    if (result.direction === 'negative') {
+      return (
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M7 7L17 17M17 17H7M17 17V7" />
+        </svg>
+      );
+    }
+    return null;
   };
 
   // Calculate point sizes based on count
@@ -91,15 +96,25 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
         {/* Header */}
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-2">
-            <span
-              className="inline-flex items-center gap-1 text-sm font-medium"
-              style={{ color: colors.primary }}
-            >
-              {getDirectionIcon()}
-              {result.direction === 'positive' ? 'Positive' : 'Negative'}
-            </span>
-            <span className="text-slate-300">•</span>
+            {result.direction !== 'none' && (
+              <span
+                className="inline-flex items-center gap-1 text-sm font-medium"
+                style={{ color: colors.primary }}
+              >
+                {getDirectionIcon()}
+                {result.direction === 'positive' ? 'Positive' : 'Negative'}
+              </span>
+            )}
+            {result.direction !== 'none' && <span className="text-slate-300">•</span>}
             <span className="text-sm text-slate-400">n = {result.sampleSize}</span>
+            
+            {/* Small sample warning inline */}
+            {result.sampleSize < 5 && (
+              <>
+                <span className="text-slate-300">•</span>
+                <span className="text-xs text-amber-600 font-medium">⚠️ Small sample</span>
+              </>
+            )}
           </div>
 
           {/* Variables */}
@@ -113,41 +128,6 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
             </span>
           </div>
         </div>
-
-        {/* Warning for insufficient data */}
-        {result.strength === 'insufficient' && (
-          <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200">
-            <div className="flex items-start gap-2">
-              <svg className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <div>
-                <p className="text-sm font-medium text-amber-700">Not Enough Data Yet</p>
-                <p className="text-xs text-amber-600 mt-0.5">
-                  Need at least 5 responses to calculate a meaningful correlation. Currently have {result.sampleSize}.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Small sample warning */}
-        {result.sampleSize >= 5 && result.sampleSize < 10 && (
-          <div className="mb-4 p-3 rounded-xl bg-blue-50 border border-blue-200">
-            <div className="flex items-start gap-2">
-              <svg className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4M12 8h.01" strokeLinecap="round" />
-              </svg>
-              <div>
-                <p className="text-sm font-medium text-blue-700">Small Sample Size</p>
-                <p className="text-xs text-blue-600 mt-0.5">
-                  With only {result.sampleSize} responses, this correlation might change as more data comes in.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Scatter Plot */}
         <div className="mb-4 bg-slate-50 rounded-xl p-3">
@@ -218,7 +198,7 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
           <div className="relative h-3 bg-slate-100 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: result.strength === 'insufficient' ? '0%' : `${percentage}%` }}
+              animate={{ width: `${percentage}%` }}
               transition={{ delay: rank * 0.15 + 0.3, duration: 0.8, ease: 'easeOut' }}
               className="absolute inset-y-0 left-0 rounded-full"
               style={{
@@ -234,7 +214,7 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
                 className="text-xs font-semibold uppercase tracking-wider"
                 style={{ color: colors.primary }}
               >
-                {strengthLabel}
+                {result.correlation === null ? 'Need 2+ points' : strengthLabel}
               </span>
             </div>
             <div className="flex items-center gap-4">
@@ -244,9 +224,9 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
                 </div>
                 <div
                   className="font-mono text-lg font-bold"
-                  style={{ color: result.strength === 'insufficient' ? '#9ca3af' : colors.primary }}
+                  style={{ color: result.correlation === null ? '#9ca3af' : colors.primary }}
                 >
-                  {result.strength === 'insufficient' ? '—' : (
+                  {result.correlation === null ? '—' : (
                     <>
                       {result.correlation >= 0 ? '+' : ''}
                       {result.correlation.toFixed(2)}
@@ -259,7 +239,7 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
                   r²
                 </div>
                 <div className="font-mono text-lg font-bold text-slate-500">
-                  {result.strength === 'insufficient' ? '—' : (result.correlation ** 2).toFixed(2)}
+                  {result.correlation === null ? '—' : (result.correlation ** 2).toFixed(2)}
                 </div>
               </div>
             </div>
@@ -267,7 +247,7 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
         </div>
 
         {/* Interpretation */}
-        {result.strength !== 'insufficient' && (
+        {result.correlation !== null && (
           <div className="mt-4 pt-4 border-t border-slate-100">
             <p className="text-sm text-slate-600 leading-relaxed">
               {getInterpretation(result)}
@@ -288,24 +268,24 @@ export function CorrelationCard({ result, rank, total }: CorrelationCardProps) {
 }
 
 function getInterpretation(result: CorrelationResult): string {
-  const { variable1Label, variable2Label, strength, direction } = result;
+  const { variable1Label, variable2Label, strength, direction, sampleSize } = result;
+  
+  const caveat = sampleSize < 5 ? ' (but we need more responses to be sure!)' : '';
 
   switch (strength) {
     case 'strong':
       return direction === 'positive'
-        ? `Strong positive relationship! People who rated ${variable1Label} higher also tended to rate ${variable2Label} higher.`
-        : `Strong negative relationship! People who rated ${variable1Label} higher tended to rate ${variable2Label} lower.`;
+        ? `Strong positive relationship! People who rated ${variable1Label} higher also tended to rate ${variable2Label} higher${caveat}`
+        : `Strong negative relationship! People who rated ${variable1Label} higher tended to rate ${variable2Label} lower${caveat}`;
     case 'moderate':
       return direction === 'positive'
-        ? `Moderate positive trend: higher ${variable1Label} tends to go with higher ${variable2Label}.`
-        : `Moderate negative trend: higher ${variable1Label} tends to go with lower ${variable2Label}.`;
+        ? `Moderate positive trend: higher ${variable1Label} tends to go with higher ${variable2Label}${caveat}`
+        : `Moderate negative trend: higher ${variable1Label} tends to go with lower ${variable2Label}${caveat}`;
     case 'weak':
       return direction === 'positive'
-        ? `Slight positive tendency between ${variable1Label} and ${variable2Label}, but the relationship is weak.`
-        : `Slight negative tendency between ${variable1Label} and ${variable2Label}, but the relationship is weak.`;
+        ? `Slight positive tendency between ${variable1Label} and ${variable2Label}, but the relationship is weak${caveat}`
+        : `Slight negative tendency between ${variable1Label} and ${variable2Label}, but the relationship is weak${caveat}`;
     case 'none':
-      return `No meaningful correlation found — ${variable1Label} and ${variable2Label} appear to be independent.`;
-    default:
-      return '';
+      return `No meaningful correlation found — ${variable1Label} and ${variable2Label} appear to be independent${caveat}`;
   }
 }

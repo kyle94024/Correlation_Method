@@ -1,3 +1,5 @@
+// src/types/index.ts
+
 export interface SurveyData {
   sleepHours: number | null;
   exerciseFrequency: number | null;
@@ -31,9 +33,9 @@ export interface CorrelationResult {
   variable2: string;
   variable1Label: string;
   variable2Label: string;
-  correlation: number;
-  strength: 'strong' | 'moderate' | 'weak' | 'none' | 'insufficient';
-  direction: 'positive' | 'negative';
+  correlation: number | null;
+  strength: 'strong' | 'moderate' | 'weak' | 'none';
+  direction: 'positive' | 'negative' | 'none';
   sampleSize: number;
   scatterData: { x: number; y: number; count: number }[];
 }

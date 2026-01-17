@@ -1,9 +1,12 @@
+// src/lib/correlation.ts
+
 import { CorrelationResult } from '@/types';
 import { QUESTION_LABELS } from '@/config/questions';
 
 // Pearson correlation coefficient calculation
-export function calculatePearsonCorrelation(x: number[], y: number[]): number {
-  if (x.length !== y.length || x.length < 2) return 0;
+export function calculatePearsonCorrelation(x: number[], y: number[]): number | null {
+  // Need at least 2 points to calculate correlation
+  if (x.length !== y.length || x.length < 2) return null;
 
   const n = x.length;
   const sumX = x.reduce((a, b) => a + b, 0);
@@ -26,9 +29,8 @@ export function calculatePearsonCorrelation(x: number[], y: number[]): number {
 }
 
 // Determine correlation strength
-export function getCorrelationStrength(r: number, sampleSize: number): 'strong' | 'moderate' | 'weak' | 'none' | 'insufficient' {
-  // Mark as insufficient if sample size is too small
-  if (sampleSize < 5) return 'insufficient';
+export function getCorrelationStrength(r: number | null): 'strong' | 'moderate' | 'weak' | 'none' {
+  if (r === null) return 'none';
   
   const absR = Math.abs(r);
   if (absR >= 0.7) return 'strong';
@@ -38,13 +40,12 @@ export function getCorrelationStrength(r: number, sampleSize: number): 'strong' 
 }
 
 // Get human-readable strength label
-export function getStrengthLabel(strength: 'strong' | 'moderate' | 'weak' | 'none' | 'insufficient'): string {
+export function getStrengthLabel(strength: 'strong' | 'moderate' | 'weak' | 'none'): string {
   switch (strength) {
     case 'strong': return 'Strong Correlation';
     case 'moderate': return 'Moderate Correlation';
     case 'weak': return 'Weak Correlation';
     case 'none': return 'No Correlation';
-    case 'insufficient': return 'Not Enough Data';
   }
 }
 
@@ -92,11 +93,14 @@ export function calculateAllCorrelations(
       // Need at least 1 paired observation to show
       if (paired.x.length < 1) continue;
 
-      const correlation = paired.x.length >= 2 
-        ? calculatePearsonCorrelation(paired.x, paired.y) 
-        : 0;
-      const strength = getCorrelationStrength(correlation, paired.x.length);
+      const correlation = calculatePearsonCorrelation(paired.x, paired.y);
+      const strength = getCorrelationStrength(correlation);
       const scatterData = generateScatterData(paired.x, paired.y);
+
+      let direction: 'positive' | 'negative' | 'none' = 'none';
+      if (correlation !== null) {
+        direction = correlation >= 0 ? 'positive' : 'negative';
+      }
 
       results.push({
         variable1: key1,
@@ -105,17 +109,18 @@ export function calculateAllCorrelations(
         variable2Label: QUESTION_LABELS[key2] || key2,
         correlation,
         strength,
-        direction: correlation >= 0 ? 'positive' : 'negative',
+        direction,
         sampleSize: paired.x.length,
         scatterData,
       });
     }
   }
 
-  // Sort by absolute correlation (strongest first), but put insufficient at the end
+  // Sort by absolute correlation (strongest first), nulls at end
   results.sort((a, b) => {
-    if (a.strength === 'insufficient' && b.strength !== 'insufficient') return 1;
-    if (b.strength === 'insufficient' && a.strength !== 'insufficient') return -1;
+    if (a.correlation === null && b.correlation === null) return 0;
+    if (a.correlation === null) return 1;
+    if (b.correlation === null) return -1;
     return Math.abs(b.correlation) - Math.abs(a.correlation);
   });
 
@@ -130,15 +135,7 @@ export function getCorrelationColor(result: CorrelationResult): {
 } {
   const { strength, direction } = result;
   
-  if (strength === 'insufficient') {
-    return {
-      primary: '#9ca3af',
-      secondary: '#d1d5db',
-      glow: 'rgba(156, 163, 175, 0.2)',
-    };
-  }
-  
-  if (strength === 'none') {
+  if (strength === 'none' || result.correlation === null) {
     return {
       primary: '#6b7280',
       secondary: '#9ca3af',
