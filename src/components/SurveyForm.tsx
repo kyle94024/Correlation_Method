@@ -92,10 +92,10 @@ export function SurveyForm() {
               </div>
 
               <h1 className="font-display font-bold text-3xl md:text-4xl text-slate-800 mb-2">
-                Nueva Psychology
+                Correlational Studies Example (Psych 102)
               </h1>
               <p className="text-slate-500 max-w-md mx-auto">
-                NON-SERIOUS EXAMPLE for demonstrating correlational studies — answer honestly and let's see if anything interesting happens!
+              THIS IS NOT A REAL CORRELATIONAL STUDY. THIS SURVEY IS NOT SCIENTIFICALLY SOUND. IT\'S JUST FOR FUN — answer honestly and let's see if anything interesting happens!
               </p>
 
               {/* Progress indicator */}
