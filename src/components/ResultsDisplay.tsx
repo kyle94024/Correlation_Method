@@ -1,3 +1,5 @@
+// src/components/ResultsDisplay.tsx
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -57,11 +59,31 @@ export function ResultsDisplay({ correlations, totalResponses, alreadySubmitted 
           </motion.div>
         </motion.div>
 
+        {/* Video Explanation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mb-8"
+        >
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="aspect-video w-full">
+              <iframe
+                src="https://www.youtube.com/embed/k4bLj3jeRSY?rel=0"
+                title="Understanding Correlations"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </motion.div>
+
         {/* Section title */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.6 }}
           className="mb-6"
         >
           <h2 className="font-display font-semibold text-xl text-slate-700 flex items-center gap-2">
@@ -168,7 +190,7 @@ export function ResultsDisplay({ correlations, totalResponses, alreadySubmitted 
           className="mt-8 text-center"
         >
           <p className="text-slate-400 text-xs">
-            Nueva Psychology • Prof. Amy's Class • Data is anonymous
+            Nueva Psychology • Amy's Class • Data is anonymous
           </p>
         </motion.div>
       </div>
