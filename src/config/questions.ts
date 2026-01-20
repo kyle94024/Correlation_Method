@@ -132,7 +132,7 @@ export const QUESTIONS: QuestionConfig[] = [
 ];
 
 export const QUESTION_LABELS: Record<string, string> = {
-  sleepHours: 'Sleep Hours',
+  sleepHours: 'Sleep Quality',
   exerciseFrequency: 'Snack Goblin',
   stressLevel: 'Stress Level',
   screenTime: 'Meme Intake',
