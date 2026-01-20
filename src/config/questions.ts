@@ -3,10 +3,10 @@ import { QuestionConfig } from '@/types';
 export const QUESTIONS: QuestionConfig[] = [
   {
     key: 'sleepHours',
-    label: 'Hours of Sleep',
-    description: 'How many hours did you sleep last night?',
-    lowLabel: 'All Nighter gng',
-    highLabel: 'I overslept (oops)',
+    label: 'Sleep Quality',
+    description: 'How well did you sleep last night?',
+    lowLabel: 'So badddd',
+    highLabel: 'Like a baby',
     icon: '😴',
   },
   {
