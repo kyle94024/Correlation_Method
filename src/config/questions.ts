@@ -133,19 +133,19 @@ export const QUESTIONS: QuestionConfig[] = [
 
 export const QUESTION_LABELS: Record<string, string> = {
   sleepHours: 'Sleep Quality',
-  exerciseFrequency: 'Snack Goblin',
+  exerciseFrequency: 'Snack Lovin',
   stressLevel: 'Stress Level',
   screenTime: 'Meme Intake',
   socialActivity: 'Extroversion',
   productivity: 'Procrastination',
   moodRating: 'Current Mood',
   caffeineIntake: 'Caffeine',
-  petAffinity: 'Dog vs Cat',
-  musicVolume: 'Music Volume',
+  petAffinity: 'Dog Over Cat',
+  musicVolume: 'Average Music Volume',
   chaosEnergy: 'Risk Taking',
   pizzaOpinion: 'Pineapple Pizza',
   optimism: 'Optimism',
-  decision: 'Decision Style',
+  decision: 'Intuition Over Logic',
   homeworkStress: 'Homework Load',
   socialBattery: 'Social Battery',
 };
